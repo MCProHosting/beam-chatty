@@ -15,6 +15,8 @@ class Connection(Evented):
         self.channel = None
         self.user_id = None
 
+        self.csrf_token = None
+
     def _get_auth_body(self):
         """Returns the authentication body for logging in to Beam."""
         return {
@@ -42,10 +44,12 @@ class Connection(Evented):
             raise NotAuthenticatedError(login_response)
 
         self.user_id = login_response.json()["id"]
+        self.csrf_token = login_response.headers["X-CSRF-Token"]
 
         # Request auth for the chat server
         chat_response = session.get(
-            self._build_addr("/api/v1/chats/{id}".format(id=self.channel))
+            self._build_addr("/api/v1/chats/{id}".format(id=self.channel)),
+            headers={"X-CSRF-Token": self.csrf_token}
         )
 
         # If there's an error here... that should not be!
@@ -82,3 +86,4 @@ class Connection(Evented):
     def message(self, msg):
         """Sends a chat message."""
         self.websocket.send("method", msg, method="msg")
+
