@@ -1,12 +1,11 @@
-''' chat connection'''
-
 import requests
 from .evented import Evented
 from .socket import Socket
 from .errors import NotAuthenticatedError
 
+
 class Connection(Evented):
-    ''' connecction class '''
+
     def __init__(self, config):
         super(Connection, self).__init__()
         self.config = config
@@ -17,14 +16,15 @@ class Connection(Evented):
         """Creates an address to Beam with the given path."""
         return self.config.BEAM_URI + path
 
-    def _log_into_beam(self):
+    def _get_chat_details(self):
         """Logs into Beam via HTTPS."""
 
         # Creates the header for the request
         header = {'Media-Type': 'application/json',
                   'Authorization': 'Bearer ' + self.config.ACCESS_TOKEN}
         # Get the request and return the responce
-        url = self._buildurl(self.config.CHATSCID_URI.format(cid=self.config.CHANNELID))
+        url = self._buildurl(self.config.CHATSCID_URI.format(
+            cid=self.config.CHANNELID))
         self.chat_details = requests.get(url=url, headers=header).json()
         url = self._buildurl(self.config.USERSCURRENT_URI)
         self.userid = requests.get(url=url, headers=header).json()['id']
@@ -44,12 +44,11 @@ class Connection(Evented):
         self.websocket.send(
             "method",
             self.config.CHANNELID, self.userid, self.chat_details["authkey"],
-            method="auth"
-        )
+            method="auth")
 
     def authenticate(self):
         """Logs into beam and connects to the chat server."""
-        self._log_into_beam()
+        self._get_chat_details()
         self._connect_to_chat()
 
     def message(self, msg):
