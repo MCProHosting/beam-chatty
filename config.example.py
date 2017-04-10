@@ -1,11 +1,14 @@
-# Address of the beam website. No trailing slash.
-BEAM_ADDR = 'https://beam.pro'
+''' Config File '''
 
-# Your username on Beam
-USERNAME = 'user123'
+# DO NOT CHANGE THESE VALUES OR THE BOT WILL BREAK
+BEAM_URI = 'https://beam.pro/api/v1/'
+USERSCURRENT_URI = 'users/current'
+CHATSCID_URI = 'chats/{cid}'
 
-# Your password on Beam
-PASSWORD = 'password'
+# THE SETTINGS BELOW CAN BE CHANGED
+# This need to be the ID for the channel you wish to join
+# https://beam.pro/api/v1/channels/[channelname]?fields=id
+CHANNELID = ''
 
-# The channel ID you want to log into
-CHANNEL = 1
+# This is up to you to obtain
+ACCESS_TOKEN = ''

@@ -1,10 +1,9 @@
-from .evented import Evented
 
+from json import loads, dumps
+from random import randint
 from tornado.websocket import websocket_connect
 from tornado.ioloop import IOLoop
-
-from random import randint
-from json import loads, dumps
+from .evented import Evented
 
 
 class Socket(Evented):
@@ -77,6 +76,7 @@ class Socket(Evented):
         }
 
         packet.update(kwargs)
+        # comment out next line if you do not want to see send msg's
         print("SEND:", packet)
         self.ws.write_message(dumps(packet))
         self.packet_id += 1
