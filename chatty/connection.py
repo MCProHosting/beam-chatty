@@ -17,7 +17,7 @@ class Connection(Evented):
         return self.config.BEAM_URI + path
 
     def _get_chat_details(self):
-        """Logs into Beam via HTTPS."""
+        """gets chat connection details from Beam"""
 
         # Creates the header for the request
         header = {'Media-Type': 'application/json',
@@ -47,7 +47,7 @@ class Connection(Evented):
             method="auth")
 
     def authenticate(self):
-        """Logs into beam and connects to the chat server."""
+        """Gets beam connection info and connects to the chat server."""
         self._get_chat_details()
         self._connect_to_chat()
 
