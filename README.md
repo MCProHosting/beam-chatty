@@ -9,7 +9,7 @@ We've built a chat bot that logs incoming messages to the console, no longer sen
 
 To use it, ensure Python 3 is installed on your system. Then:
 
-* install dependencies ()
+* install dependencies
   * Windows : `python setup.py install`
   * Linux   : `sudo python setup.py install`
 * copy `config.example.py` to `config.py` and add your authentication information
