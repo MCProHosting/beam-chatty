@@ -1,3 +1,6 @@
+'''Sets up required dependancies to run the bot'''
+
+
 from setuptools import setup, find_packages
 
 setup(

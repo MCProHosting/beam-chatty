@@ -1,3 +1,5 @@
+'''Chat Bot Stuff'''
+
 from .connection import Connection
 
 

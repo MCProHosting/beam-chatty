@@ -1,3 +1,5 @@
+'''Handles the connection to Beam Chat servers'''
+
 import requests
 from .evented import Evented
 from .socket import Socket
@@ -5,6 +7,7 @@ from .errors import NotAuthenticatedError
 
 
 class Connection(Evented):
+    '''Connection Class'''
 
     def __init__(self, config):
         super(Connection, self).__init__()
