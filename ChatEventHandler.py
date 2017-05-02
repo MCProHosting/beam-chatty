@@ -19,7 +19,7 @@ def handler(data, chat):
 
     # handles all the send messages to the server
     elif data['type'] == 'method':
-        typemethod(data)
+        type_method(data)
 
     # Bot System messages
     elif data['type'] == 'system':
@@ -74,7 +74,6 @@ def typeevent(data, chat):
         else:
             # format chat messages (Regular)
             print(data['data']['user_name'] + ' : ' + format_msg(data['data']))
-
             # CHAT COMMAND - This will reply to a chat
             # message only containing '!ping
             if format_msg(data['data']) == '!ping':
@@ -95,7 +94,7 @@ def typeevent(data, chat):
         CONFIG.POLL_SPAM = False
 
 
-def typemethod(data):
+def type_method(data):
     '''handles Event type Data'''
 
     if data['method'] == 'auth':
@@ -112,15 +111,7 @@ def typemethod(data):
 
 def format_msg(data):
     '''formats the msg text string properly'''
-    msg = ''
-
-    # gets the message list amount
-    list_count = len(data['message']['message'])
-
-    # loops though each message list entries
-    for counter in range(0, list_count):
-        # joins the message together
-        msg += str(data['message']['message'][counter]['text'])
+    msg = ''.join(item["text"] for item in data["message"]["message"])
 
     # returns the message
     return msg
