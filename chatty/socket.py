@@ -52,9 +52,8 @@ class Socket(Evented):
             self.emit('message', self.system_msg(
                 'Connetion to chat servers opened...'))
         else:
-            self.emit('message', self.system_msg((
-                'Unable to make connection to server,',
-                'retying alternative servers')))
+            self.emit('message', self.system_msg(
+                'Cannot connection to server, retying alternative servers'))
             self.connected = False
 
             IOLoop.instance().call_later(1, self._connect)
@@ -62,9 +61,8 @@ class Socket(Evented):
     def _on_close(self):
         self.connected = False
         self.emit("closed")
-        self.emit('message', self.system_msg((
-            'Connection to the server has been lost,',
-            'retying alternative servers')))
+        self.emit('message', self.system_msg(
+            'Server connection lost, retying alternative servers'))
         IOLoop.instance().call_later(1, self._connect)
 
     def send(self, _type, *args, **kwargs):

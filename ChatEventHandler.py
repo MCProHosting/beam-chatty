@@ -1,117 +1,104 @@
-'''
-Handles all the chat events and prints to the console in a readable format
-'''
-import config as configuration
-
-CONFIG = configuration
+''' Handles and formats chat events '''
 
 
-def handler(data, chat):
-    ''' parse chat server packets into a readable format '''
+class Handler():
+    '''handles chat events'''
 
-    # Parses Server reply msg's?
-    if data['type'] == 'reply':
-        typereply(data)
+    def __init__(self, config, chat):
+        self.config = config
+        self.event_types = {
+            'reply': self.type_reply, 'event': self.type_event,
+            'method': self.type_method, 'system': self.type_system}
+        self.poll_switch = True
+        self.chat = chat
 
-    # handles chat events
-    elif data['type'] == 'event':
-        typeevent(data, chat)
+    def formatting(self, data):
+        '''
+        checks the event type and calls the function
+        relating to that event type
+        '''
+        func = self.event_types[data['type']]
+        func(data)
+        if self.config.CHATDEBUG:
+            print(data)
 
-    # handles all the send messages to the server
-    elif data['type'] == 'method':
-        type_method(data)
-
-    # Bot System messages
-    elif data['type'] == 'system':
-        if CONFIG.CHATDEBUG:
-            print('SYSTEM MESSAGE: ' + str(data['data']))
-
-    else:
-        # If any event has not been handled then this
-        # will print the responce
-        print('CHAT EVENT HANDLER: ' + str(data))
-
-
-def typereply(data):
-    '''Handles the Reply type data'''
-
-    if CONFIG.CHATDEBUG:
-        print('Server Reply: ' + str(data['data']))
-
-
-def typeevent(data, chat):
-    '''handles Event type Data'''
-
-    # Connection welcome responce
-    if data['event'] == 'WelcomeEvent':
-        print("Connected to the channel chat...")
-
-    # User Join channel Message
-    elif data['event'] == 'UserJoin':
-        if data['data']['username'] is not None:
-            print(data['data']['username'] + ' has joined the channel.')
-
-    # User Leave channel message
-    elif data['event'] == 'UserLeave':
-        if data['data']['username'] is not None:
-            print(data['data']['username'] + ' has left the channel.')
-
-    # Format all chat messages by users
-    elif data['event'] == 'ChatMessage':
-        if 'whisper' in data['data']['message']['meta']:
-            # format chat messages (whispers)
-            print(data['data']['user_name'] + ' → ' + data['data']['target'],
-                  ': ' + format_msg(data['data']))
-        elif 'me' in data['data']['message']['meta']:
-            # format chat messages (Actions)
-            print(data['data']['user_name'],
-                  format_msg(data['data']))
-
-        elif 'me' in data['data']['message']['meta']:
-            # format chat messages (whispers)
-            print(data['data']['user_name'],
-                  format_msg(data['data']))
+    def type_reply(self, data):
+        '''Handles the Reply type data'''
+        if 'data' in data:
+            if 'authenticated' in data['data']:
+                if data['data']['authenticated']:
+                    print('Authenticated with the server')
+                else:
+                    print('Authenticated Failed, Chat log restricted')
+            else:
+                print('Server Reply: {}'.format(str(data)))
         else:
-            # format chat messages (Regular)
-            print(data['data']['user_name'] + ' : ' + format_msg(data['data']))
-            # CHAT COMMAND - This will reply to a chat
-            # message only containing '!ping
-            if format_msg(data['data']) == '!ping':
-                chat.message('Somone wants some ping pong action?')
+            print('Server Reply: {}'.format(str(data['error'])))
 
-    # A poll has started
-    # has anti log spam
-    elif data['event'] == 'PollStart':
-        if CONFIG.POLL_SPAM:
-            print('{} has started a poll'.format(
+    def type_event(self, data):
+        '''handles the reply chat event types'''
+        event_string = {
+            'WelcomeEvent': 'Connected to the channel chat...',
+            'UserJoin': '{} has joined the channel.',
+            'UserLeave': '{} has left the channel.',
+            'ChatMessage': '{user} : {msg}',
+            'whisper': '{user} → {target} : {msg}',
+            'me': '{user} {msg}',
+            'PollStart': '{} has started a poll',
+            'PollEnd': 'The poll started by {} has ended'}
+
+        if data['event'] == 'WelcomeEvent':
+            print(event_string[data['event']])
+
+        elif data['event'] == 'UserJoin' or data['event'] == 'UserLeave':
+            if data['data']['username'] is not None:
+                print(event_string[data['event']].format(
+                    data['data']['username']))
+
+        elif data['event'] == 'PollStart':
+            if self.poll_switch:
+                print(event_string[data['event']].format(
+                    data['data']['author']['user_name']))
+                self.poll_switch = False
+
+        elif data['event'] == 'PollEnd':
+            print(event_string[data['event']].format(
                 data['data']['author']['user_name']))
-            CONFIG.POLL_SPAM = False
+            self.poll_switch = True
 
-    # A poll has ended
-    elif data['event'] == 'PollEnd':
-        print('The poll started by {} has ended'.format(
-            data['data']['author']['user_name']))
-        CONFIG.POLL_SPAM = False
+        elif data['event'] == 'ChatMessage':
+            msg = ''.join(
+                item["text"] for item in data['data']["message"]["message"])
+            if 'whisper' in data['data']['message']['meta']:
+                print(event_string['whisper'].format(
+                    user=data['data']['user_name'],
+                    target=data['data']['target'],
+                    msg=msg))
 
+            elif 'me' in data['data']['message']['meta']:
+                print(event_string['me'].format(
+                    user=data['data']['user_name'],
+                    msg=msg))
+            else:
+                print(event_string[data['event']].format(
+                    user=data['data']['user_name'],
+                    msg=msg))
+                if msg == '!ping':
+                    self.chat.message('Its ping pong time')
 
-def type_method(data):
-    '''handles Event type Data'''
+    def type_method(self, data):
+        '''handles the reply chat event types'''
+        if self.config.CHATDEBUG:
+            if data['method'] == 'auth':
+                print('Authenticating with the server...')
 
-    if data['method'] == 'auth':
-        print('Sending Authentication...')
+            elif data['method'] == 'msg':
+                if self.config.CHATDEBUG:
+                    print('METHOD MSG: {}'.format(str(data)))
+            else:
+                print('METHOD MSG: {}'.format(str(data)))
 
-    # Messages the bot sends
-    elif data['method'] == 'msg':
-        if CONFIG.CHATDEBUG:
-            print('METHOD MESSAGE: ' + str(data))
-    else:
-        # catches unhandled messages
-        print('METHOD MESSAGE: ' + str(data))
-
-
-def format_msg(data):
-    '''formats the msg text string properly'''
-    msg = ''.join(item["text"] for item in data["message"]["message"])
-
-    # returns the message
-    return msg
+    def type_system(self, data):
+        '''handles the reply chat event types'''
+        if self.config.CHATDEBUG:
+            print('SYSTEM MSG: {}'.format(str(data['data'])))

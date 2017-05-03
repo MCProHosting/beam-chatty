@@ -11,7 +11,7 @@ To use it, ensure Python 3 is installed on your system. Then:
 
 * install dependencies
   * Windows : `python setup.py install`
-  * Linux   : `sudo python setup.py install`
+  * Linux   : `python3 setup.py install`
 * copy `config.example.py` to `config.py` and add your authentication information
 * run the example chatbot 
   * Windows : Launch `run.bat` (fixes issues with certain font types)

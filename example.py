@@ -9,18 +9,18 @@ import ChatEventHandler
 
 
 def _handle_chat(data):
-    ChatEventHandler.handler(data, CHAT)
+    chatevents.formatting(data)
 
 
 if __name__ == "__main__":
-    CHAT = create(config)
-
+    chat = create(config)
+    chatevents = ChatEventHandler.Handler(config, chat)
     # Tell chat to authenticate with the beam server. It'll throw
     # a chatty.errors.NotAuthenticatedError if it fails.
-    CHAT.authenticate()
+    chat.authenticate()
 
     # Listen for incoming messages. When they come in, just print them.
-    CHAT.on("message", _handle_chat)
+    chat.on("message", _handle_chat)
 
     # Start the tornado event loop.
     IOLoop.instance().start()

@@ -10,7 +10,8 @@ CHATSCID_URI = 'chats/{cid}'
 # https://beam.pro/api/v1/channels/channelname?fields=id
 CHANNELID = '123456'
 
-# This is up to you to obtain
+# This is up to you to obtain. This can be done though
+# Rest API. for more info https://dev.beam.pro/reference/oauth/index.html
 ACCESS_TOKEN = 'EnterYourAccessToken'
 
 # Client ID, obtained from https://beam.pro/lab
@@ -18,8 +19,6 @@ ACCESS_TOKEN = 'EnterYourAccessToken'
 CLIENTID = 'EnterYourClientID'
 
 
-# enables/disables raw chat json
+# enables/disables raw chat details as recieved from the server
+# without the chat formatting
 CHATDEBUG = False
-
-# enables/disables spam that is caused by polls
-POLL_SPAM = True
