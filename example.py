@@ -1,5 +1,6 @@
 """
-Example chat bot that monitors incoming messages. responds to !ping command
+Example chat bot that monitors incoming messages.
+Responds to !ping command.
 """
 
 from tornado.ioloop import IOLoop
